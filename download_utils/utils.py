@@ -41,12 +41,10 @@ class DownloadSpec:
         paths = self._get_strings(self.file_path_template, timestamps)
         return [(u, p) for u, p in zip(urls, paths)] 
 
-    @staticmethod
-    def check_file(file_path: str) -> bool:
+    def check_file(self, file_path: str) -> bool:
         return True
     
-    @staticmethod
-    def preprocess_callback(file_path: str) -> None:
+    def preprocess_callback(self, file_path: str) -> None:
         pass
 
 
