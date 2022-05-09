@@ -29,7 +29,7 @@ class DownloadSpec:
         else:
             ts = self.reference_timestamp
         timestamps = []
-        while ts.date() <= end.date():
+        while ts <= end:
             if ts >= start:
                 timestamps.append(ts)
             ts += self.frequency
@@ -100,8 +100,8 @@ class DownloadTask(luigi.Task):
 
 
 class DownloadsForDateRange(luigi.WrapperTask):
-    start_date = luigi.DateParameter()
-    end_date = luigi.DateParameter(default=datetime.date.today())
+    start_date = luigi.DateMinuteParameter()
+    end_date = luigi.DateMinuteParameter(default=datetime.datetime.now())
     
     def get_download_specs(self) -> List[DownloadSpec]:
         return []
