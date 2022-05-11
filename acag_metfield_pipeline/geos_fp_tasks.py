@@ -175,7 +175,7 @@ class MassFluxDerivedWindCollection(acag_metfield_pipeline.basic_tasks.DateMinut
 
 class AllGEOSFPTasks(luigi.WrapperTask):
     start = luigi.DateMinuteParameter()
-    stop = luigi.DateMinuteParameter()
+    stop = luigi.DateMinuteParameter(default=datetime.now()-timedelta(hours=12))
 
     def requires(self):
         yield NativeGEOSFPCollections(start=self.start, stop=self.stop)
