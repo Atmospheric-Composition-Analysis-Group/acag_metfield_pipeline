@@ -8,12 +8,15 @@
             "name": "Python: Test GEOS-FP",
             "type": "python",
             "request": "launch",
-            "program": "download_utils/geos_fp_tasks.py",
+            "module": "luigi",
+            "args": [ 
+                    "--module", "acag_metfield_pipeline.geos_fp_tasks", "AllGEOSFPTasks", 
+                    "--start", "2022-05-01T0000", 
+                    "--stop",  "2022-05-01T0159", 
+                    "--local-scheduler"
+            ],
             "console": "integratedTerminal",
             "justMyCode": true,
-            "env": {
-                "PYTHONPATH": "${workspaceRoot};${workspaceRoot}/fv3_mass_flux_tools"
-            },
             "cwd": "${workspaceRoot}"
         }
     ]

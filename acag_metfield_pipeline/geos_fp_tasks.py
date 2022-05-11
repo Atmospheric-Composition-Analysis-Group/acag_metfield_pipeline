@@ -1,5 +1,5 @@
 import xarray as xr
-import download_utils.basic_tasks
+import acag_metfield_pipeline.basic_tasks
 from typing import List
 import luigi
 from datetime import datetime, timedelta, time
@@ -10,7 +10,7 @@ from fv3_mass_flux_tools.process import create_derived_wind_dataset
 
 #region "GEOS-FP collection download base classes"
 
-class CollectionDownloadTask(download_utils.basic_tasks.DateMinuteDownloadTask):
+class CollectionDownloadTask(acag_metfield_pipeline.basic_tasks.DateMinuteDownloadTask):
     keep_vars = None
 
     def relpath_strftime_format(self) -> str:
@@ -105,7 +105,7 @@ class tavg3_2d_chm_Nx(Tavg3CollectionDownloadTask):
     keep_vars = ["LWI"]
 
 
-class NativeGEOSFPCollections(download_utils.basic_tasks.DateMinuteRangeAggregator):
+class NativeGEOSFPCollections(acag_metfield_pipeline.basic_tasks.DateMinuteRangeAggregator):
     task_classes = [
         tavg1_2d_rad_Nx,
         tavg1_2d_lnd_Nx,
@@ -131,7 +131,7 @@ class tavg_1hr_ctm_c0720_v72(Tavg1CollectionDownloadTask):
 class inst_1hr_ctm_c0720_v72(Inst1CollectionDownloadTask):
     collection_name = "inst_1hr_ctm_c0720_v72"
 
-class MassFluxCollection(download_utils.basic_tasks.DateMinuteRangeAggregator):
+class MassFluxCollection(acag_metfield_pipeline.basic_tasks.DateMinuteRangeAggregator):
     task_classes = [
         tavg_1hr_ctm_c0720_v72,
         inst_1hr_ctm_c0720_v72,
@@ -142,7 +142,7 @@ class MassFluxCollection(download_utils.basic_tasks.DateMinuteRangeAggregator):
 
 #region "GEOS-FP C720 derived wind field collection classes"
 
-class tavg_1hr_ctmwind_c0720_v72(download_utils.basic_tasks.DateMinuteTask):
+class tavg_1hr_ctmwind_c0720_v72(acag_metfield_pipeline.basic_tasks.DateMinuteTask):
     collection_name = "tavg_1hr_ctmwind_c0720_v72"
     grid_data_dir = luigi.Parameter()
     temporal_frequency = timedelta(hours=1)
@@ -165,7 +165,7 @@ class tavg_1hr_ctmwind_c0720_v72(download_utils.basic_tasks.DateMinuteTask):
         tavg_1hr_winds.to_netcdf(path_out)
         pass
 
-class MassFluxDerivedWindCollection(download_utils.basic_tasks.DateMinuteRangeAggregator):
+class MassFluxDerivedWindCollection(acag_metfield_pipeline.basic_tasks.DateMinuteRangeAggregator):
     task_classes = [
         tavg_1hr_ctmwind_c0720_v72,
     ]
@@ -173,13 +173,20 @@ class MassFluxDerivedWindCollection(download_utils.basic_tasks.DateMinuteRangeAg
 #endregion
 
 
-if __name__ == '__main__':
-    data_dir = 'C:\\Users\\liamb\\ACAG\\operational_downloads\\scratch'
-    start = datetime(2022,5,1,0)
-    stop = datetime(2022,5,1,1,59)
-    all_downloads = [
-        NativeGEOSFPCollections(start=start, stop=stop),
-        MassFluxCollection(start=start, stop=stop),
-        MassFluxDerivedWindCollection(start=start, stop=stop),
-    ]
-    luigi.build(all_downloads, workers=8, local_scheduler=True)
+class AllGEOSFPTasks(luigi.WrapperTask):
+    start = luigi.DateMinuteParameter()
+    stop = luigi.DateMinuteParameter()
+
+    def requires(self):
+        yield NativeGEOSFPCollections(start=self.start, stop=self.stop)
+        yield MassFluxCollection(start=self.start, stop=self.stop)
+        yield MassFluxDerivedWindCollection(start=self.start, stop=self.stop)
+
+# if __name__ == '__main__':
+#     data_dir = 'C:\\Users\\liamb\\ACAG\\operational_downloads\\scratch'
+#     start = datetime(2022,5,1,0)
+#     stop = datetime(2022,5,1,1,59)
+#     all_downloads = [
+#         AllGEOSFPTasks(start=start, stop=stop)
+#     ]
+#     luigi.build(all_downloads, workers=8, local_scheduler=True)

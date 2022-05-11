@@ -1,6 +1,6 @@
 import pathlib
 import luigi
-import download_utils.static_utils
+import acag_metfield_pipeline.static_utils
 from datetime import datetime, timedelta, time
 
 
@@ -46,7 +46,7 @@ class DateMinuteDownloadTask(DateMinuteTask):
         url = url_format.format(date=self.date)
         path_format = self.relpath_strftime_format()
         file_path = self.output().path
-        download_utils.static_utils.download(url, file_path, self.check_file, self.preprocess_callback)
+        acag_metfield_pipeline.static_utils.download(url, file_path, self.check_file, self.preprocess_callback)
 
 class DateMinuteRangeAggregator(luigi.WrapperTask):
     start = luigi.DateMinuteParameter()

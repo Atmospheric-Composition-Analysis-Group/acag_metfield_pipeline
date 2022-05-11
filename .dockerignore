@@ -3,6 +3,7 @@
 *.pyo
 *.pyd
 *.vscode
+*.egg-info
 fv3_mass_flux_tools
 .git
 .pytest_cache
