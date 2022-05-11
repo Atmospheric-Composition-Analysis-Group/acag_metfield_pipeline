@@ -5,7 +5,6 @@ import requests
 import logging
 
 
-
 def download(url: str, file_path: Union[str, Path], check_file: Callable[[str],bool]=None, preprocess_cb: Callable[[str],None]=None, CHUNK_SIZE=8192) -> bool:
     file_path = Path(file_path) if isinstance(file_path, str) else file_path
     check_file = (lambda s: True) if check_file is None else check_file

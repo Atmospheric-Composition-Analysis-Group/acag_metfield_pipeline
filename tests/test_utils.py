@@ -1,7 +1,7 @@
 from sqlite3 import Date
 from pandas import Timestamp, DateOffset
 from download_utils.utils import *
-from download_utils.geosfp import tavg1_2d_rad_Nx
+from download_utils.geos_fp_tasks import tavg1_2d_rad_Nx
 
 
 def test_download_list():

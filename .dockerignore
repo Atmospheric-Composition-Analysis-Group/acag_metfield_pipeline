@@ -1,0 +1,10 @@
+**/__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.vscode
+fv3_mass_flux_tools
+.git
+.pytest_cache
+*.nc
+*.nc4

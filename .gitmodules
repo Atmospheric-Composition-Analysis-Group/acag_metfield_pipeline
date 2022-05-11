@@ -1,3 +1,0 @@
-[submodule "fv3_mass_flux_tools"]
-	path = fv3_mass_flux_tools
-	url = git@github.com:LiamBindle/fv3_mass_flux_tools.git

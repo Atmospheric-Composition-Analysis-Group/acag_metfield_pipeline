@@ -8,7 +8,7 @@
             "name": "Python: Test GEOS-FP",
             "type": "python",
             "request": "launch",
-            "program": "download_utils/geosfp.py",
+            "program": "download_utils/geos_fp_tasks.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "env": {
