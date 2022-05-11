@@ -5,15 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Python: Test GEOS-FP",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "download_utils/geosfp.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "env": {
-                "PYTHONPATH": "${workspaceRoot}"
-            }
+                "PYTHONPATH": "${workspaceRoot};${workspaceRoot}/fv3_mass_flux_tools"
+            },
+            "cwd": "${workspaceRoot}"
         }
     ]
 }
