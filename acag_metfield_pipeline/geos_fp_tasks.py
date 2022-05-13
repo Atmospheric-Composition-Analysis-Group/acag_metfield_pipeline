@@ -6,6 +6,9 @@ from datetime import datetime, timedelta, time
 import re
 import pathlib
 from fv3_mass_flux_tools.process import create_derived_wind_dataset
+import numpy as np
+import sparselt.esmf
+import sparselt.xr
 
 
 #region "GEOS-FP collection download base classes"
@@ -172,6 +175,89 @@ class MassFluxDerivedWindCollection(acag_metfield_pipeline.basic_tasks.DateMinut
 
 #endregion
 
+#region "GEOS-FP derived wind field for GC-Classic nested grids"
+
+class nested_regridder(acag_metfield_pipeline.basic_tasks.DateMinuteTask):
+    collection_name = None
+    shape_out = (None, None)
+    regridding_weights_file = luigi.Parameter()
+    gridspec_file = luigi.Parameter()
+    keep_vars = []
+
+    def relpath_strftime_format(self) -> str:
+        return "{date:Y%Y/M%m/D%d}/" f"GEOS.fp.asm.{self.collection_name}" ".{date:%Y%m%d_%H%M}.V01.nc4"
+
+    def tweak_ds(self, ds: xr.Dataset) -> xr.Dataset:
+        return ds
+
+    def run(self):
+        regridding_weights = pathlib.Path(self.regridding_weights_file)
+        gridspec_file = xr.open_dataset(self.gridspec_file)
+        input_file = xr.open_dataset(str(self.input()[0].path))
+        transform = sparselt.esmf.load_weights(
+            regridding_weights,
+            input_dims=[('nf', 'Ydim', 'Xdim'), (6, 720, 720)],
+            output_dims=[('lat', 'lon'), self.shape_out],
+        )
+        ds = sparselt.xr.apply(transform, input_file[self.keep_vars], gridspec_file)
+        ds.attrs = dict(
+            title='GEOS FP (Forward Processing) Derived Wind Fields',
+            institution='Washington University in St. Louis',
+            source=f'calculated from GEOS.fp.asm.tavg_1hr_ctm_c0720_v72 data collection using Atmospheric-Composition-Analysis-Group/acag_metfield_pipeline',
+            references='https://github.com/LiamBindle/fv3_mass_flux_tools\nhttp://gmao.gsfc.nasa.gov\nhttps://gmao.gsfc.nasa.gov/operations/GEOS5_V1_File_Specification.pdf',
+            comment='See https://github.com/LiamBindle/fv3_mass_flux_tools and Atmospheric-Composition-Analysis-Group/acag_metfield_pipeline for details.'
+        )
+        for varname in self.keep_vars:
+            ds[varname].attrs = input_file[varname].attrs
+            ds[varname].encoding = dict(
+                dtype='float32',
+                _FillValue=1.0e15
+            )
+        path_out = str(self.output().path)
+        pathlib.Path(path_out).parent.mkdir(parents=True, exist_ok=True)
+        ds.to_netcdf(path_out)
+
+
+class nested_geosfp_a1dyn(nested_regridder):
+    temporal_frequency = timedelta(hours=1)
+    temporal_offset = time(minute=30)
+    keep_vars = ['UA', 'VA']
+
+    def requires(self):
+        yield tavg_1hr_ctmwind_c0720_v72(date=self.date)
+
+class nested_geosfp_i1dyn(nested_regridder):
+    temporal_frequency = timedelta(hours=1)
+    temporal_offset = time(minute=0)
+    keep_vars = ['QV', 'PS']
+
+    def requires(self):
+        yield inst_1hr_ctm_c0720_v72(date=self.date)
+
+class geosfp_a1dyn_as(nested_geosfp_a1dyn):
+    collection_name = "A1dyn.0125x015625.AS"
+    shape_out = (529, 577)
+
+class geosfp_i1dyn_as(nested_geosfp_i1dyn):
+    collection_name = "I1dyn.0125x015625.AS"
+    shape_out = (529, 577)
+
+# class geosfp_a1dyn_na(nested_geosfp_a1dyn):
+#     collection_name = "A1dyn.0125x015625.NA"
+#     shape_out = (403, 449)
+
+# class geosfp_a1dyn_eu(nested_geosfp_a1dyn):
+#     collection_name = "A1dyn.0125x015625.EU"
+#     shape_out = (229, 353)
+
+class NestedASMassFluxDerivedWindCollection(acag_metfield_pipeline.basic_tasks.DateMinuteRangeAggregator):
+    task_classes = [
+        geosfp_a1dyn_as,
+        geosfp_i1dyn_as,
+    ]
+
+
+#endregion
 
 class AllGEOSFPTasks(luigi.WrapperTask):
     start = luigi.DateMinuteParameter()
@@ -182,11 +268,11 @@ class AllGEOSFPTasks(luigi.WrapperTask):
         yield MassFluxCollection(start=self.start, stop=self.stop)
         yield MassFluxDerivedWindCollection(start=self.start, stop=self.stop)
 
-# if __name__ == '__main__':
-#     data_dir = 'C:\\Users\\liamb\\ACAG\\operational_downloads\\scratch'
-#     start = datetime(2022,5,1,0)
-#     stop = datetime(2022,5,1,1,59)
-#     all_downloads = [
-#         AllGEOSFPTasks(start=start, stop=stop)
-#     ]
-#     luigi.build(all_downloads, workers=8, local_scheduler=True)
+if __name__ == '__main__':
+    data_dir = 'C:\\Users\\liamb\\ACAG\\operational_downloads\\scratch'
+    start = datetime(2022,5,1,0)
+    stop = datetime(2022,5,1,0,59)
+    all_downloads = [
+        geosfp_a1dyn_as(start=start, stop=stop)
+    ]
+    luigi.build(all_downloads, workers=8, local_scheduler=True)

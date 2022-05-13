@@ -10,13 +10,13 @@
             "request": "launch",
             "module": "luigi",
             "args": [ 
-                    "--module", "acag_metfield_pipeline.geos_fp_tasks", "AllGEOSFPTasks", 
+                    "--module", "acag_metfield_pipeline.geos_fp_tasks", "NestedASMassFluxDerivedWindCollection", 
                     "--start", "2022-05-01T0000", 
-                    "--stop",  "2022-05-01T0159", 
+                    "--stop",  "2022-05-01T0059", 
                     "--local-scheduler"
             ],
             "console": "integratedTerminal",
-            "justMyCode": true,
+            "justMyCode": false,
             "cwd": "${workspaceRoot}"
         }
     ]
