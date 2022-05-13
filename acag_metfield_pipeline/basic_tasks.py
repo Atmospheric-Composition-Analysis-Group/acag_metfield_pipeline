@@ -51,11 +51,10 @@ class DateMinuteDownloadTask(DateMinuteTask):
 class DateMinuteRangeAggregator(luigi.WrapperTask):
     start = luigi.DateMinuteParameter()
     stop = luigi.DateMinuteParameter()
-    root_dir = luigi.Parameter()
     task_classes = []
 
     def requires(self):
         for task_class in self.task_classes:
             dm_range = task_class.get_dateminute_range(self.start, self.stop)
             for dm in dm_range:
-                yield task_class(date=dm, root_dir=self.root_dir)
+                yield task_class(date=dm)

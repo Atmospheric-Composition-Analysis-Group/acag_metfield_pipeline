@@ -187,9 +187,6 @@ class nested_regridder(acag_metfield_pipeline.basic_tasks.DateMinuteTask):
     def relpath_strftime_format(self) -> str:
         return "{date:Y%Y/M%m/D%d}/" f"GEOS.fp.asm.{self.collection_name}" ".{date:%Y%m%d_%H%M}.V01.nc4"
 
-    def tweak_ds(self, ds: xr.Dataset) -> xr.Dataset:
-        return ds
-
     def run(self):
         regridding_weights = pathlib.Path(self.regridding_weights_file)
         gridspec_file = xr.open_dataset(self.gridspec_file)
@@ -218,7 +215,7 @@ class nested_regridder(acag_metfield_pipeline.basic_tasks.DateMinuteTask):
         ds.to_netcdf(path_out)
 
 
-class nested_geosfp_a1dyn(nested_regridder):
+class a1dyn_nested(nested_regridder):
     temporal_frequency = timedelta(hours=1)
     temporal_offset = time(minute=30)
     keep_vars = ['UA', 'VA']
@@ -226,7 +223,7 @@ class nested_geosfp_a1dyn(nested_regridder):
     def requires(self):
         yield tavg_1hr_ctmwind_c0720_v72(date=self.date)
 
-class nested_geosfp_i1dyn(nested_regridder):
+class i1dyn_nested(nested_regridder):
     temporal_frequency = timedelta(hours=1)
     temporal_offset = time(minute=0)
     keep_vars = ['QV', 'PS']
@@ -234,28 +231,39 @@ class nested_geosfp_i1dyn(nested_regridder):
     def requires(self):
         yield inst_1hr_ctm_c0720_v72(date=self.date)
 
-class geosfp_a1dyn_as(nested_geosfp_a1dyn):
+class a1dyn_as(a1dyn_nested):
     collection_name = "A1dyn.0125x015625.AS"
     shape_out = (529, 577)
 
-class geosfp_i1dyn_as(nested_geosfp_i1dyn):
+class i1dyn_as(i1dyn_nested):
     collection_name = "I1dyn.0125x015625.AS"
     shape_out = (529, 577)
 
-# class geosfp_a1dyn_na(nested_geosfp_a1dyn):
-#     collection_name = "A1dyn.0125x015625.NA"
-#     shape_out = (403, 449)
+class a1dyn_na(a1dyn_nested):
+    collection_name = "A1dyn.0125x015625.NA"
+    shape_out = (403, 449)
 
-# class geosfp_a1dyn_eu(nested_geosfp_a1dyn):
-#     collection_name = "A1dyn.0125x015625.EU"
-#     shape_out = (229, 353)
+class i1dyn_na(i1dyn_nested):
+    collection_name = "I1dyn.0125x015625.NA"
+    shape_out = (403, 449)
 
-class NestedASMassFluxDerivedWindCollection(acag_metfield_pipeline.basic_tasks.DateMinuteRangeAggregator):
+class a1dyn_eu(a1dyn_nested):
+    collection_name = "A1dyn.0125x015625.EU"
+    shape_out = (229, 353)
+
+class i1dyn_eu(i1dyn_nested):
+    collection_name = "I1dyn.0125x015625.EU"
+    shape_out = (229, 353)
+
+class MassFluxDerivedWindCollectionNested(acag_metfield_pipeline.basic_tasks.DateMinuteRangeAggregator):
     task_classes = [
-        geosfp_a1dyn_as,
-        geosfp_i1dyn_as,
+        a1dyn_as,
+        i1dyn_as,
+        a1dyn_na,
+        i1dyn_na,
+        a1dyn_eu,
+        i1dyn_eu,
     ]
-
 
 #endregion
 
@@ -267,12 +275,4 @@ class AllGEOSFPTasks(luigi.WrapperTask):
         yield NativeGEOSFPCollections(start=self.start, stop=self.stop)
         yield MassFluxCollection(start=self.start, stop=self.stop)
         yield MassFluxDerivedWindCollection(start=self.start, stop=self.stop)
-
-if __name__ == '__main__':
-    data_dir = 'C:\\Users\\liamb\\ACAG\\operational_downloads\\scratch'
-    start = datetime(2022,5,1,0)
-    stop = datetime(2022,5,1,0,59)
-    all_downloads = [
-        geosfp_a1dyn_as(start=start, stop=stop)
-    ]
-    luigi.build(all_downloads, workers=8, local_scheduler=True)
+        yield MassFluxDerivedWindCollectionNested(start=self.start, stop=self.stop)
