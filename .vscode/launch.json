@@ -10,7 +10,7 @@
             "request": "launch",
             "module": "luigi",
             "args": [ 
-                    "--module", "acag_metfield_pipeline.geos_fp_tasks", "MassFluxDerivedWindCollectionNested", 
+                    "--module", "acag_metfield_pipeline.geos_fp_tasks", "MassFluxDerivedWindCollection", 
                     "--start", "2022-05-01T0000", 
                     "--stop",  "2022-05-01T0059", 
                     "--local-scheduler"
