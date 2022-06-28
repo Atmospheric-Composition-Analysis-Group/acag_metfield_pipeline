@@ -26,6 +26,11 @@ class DateMinuteTask(luigi.Task):
             search_time += cls.temporal_frequency
 
         return dateminute_range
+    
+    def output(self):
+        strftime_format = self.relpath_strftime_format()
+        file_path = pathlib.Path(self.root_dir) / strftime_format.format(date=self.date)
+        return luigi.LocalTarget(file_path)
 
 
 class DownloadBaseTask(luigi.Task):
