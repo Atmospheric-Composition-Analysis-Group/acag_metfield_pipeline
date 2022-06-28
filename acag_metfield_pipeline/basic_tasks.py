@@ -133,3 +133,9 @@ class BatchDownload(luigi.WrapperTask):
         super().run()
         if self.processed_lists_dir:
             shutil.move(self.url_list, self.processed_lists_dir)
+
+
+@luigi.Task.event_handler(luigi.Event.FAILURE)
+def on_failure_callback(task):
+    with open("failed_tasks.txt", "a") as f:
+        f.write(task.__repr__())
