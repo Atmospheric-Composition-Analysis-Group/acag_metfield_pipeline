@@ -276,3 +276,8 @@ class AllGEOSFPTasks(luigi.WrapperTask):
         yield MassFluxCollection(start=self.start, stop=self.stop)
         yield MassFluxDerivedWindCollection(start=self.start, stop=self.stop)
         yield MassFluxDerivedWindCollectionNested(start=self.start, stop=self.stop)
+
+@luigi.Task.event_handler(luigi.Event.FAILURE)
+def on_failure_callback(task):
+    with open("failed_tasks.txt", "a") as f:
+        f.write(task.__repr__())
