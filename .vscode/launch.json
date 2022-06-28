@@ -25,8 +25,7 @@
             "request": "launch",
             "module": "luigi",
             "args": [ 
-                    "--module", "acag_metfield_pipeline.geos_it_tasks", "DownloadGESDISCOrder", 
-                    "--url-list", "C:\\Users\\liamb\\ACAG\\operational_downloads\\scratch\\GES DISC Order Notification Order ID_ DN1653562849-20593.eml", 
+                    "--module", "acag_metfield_pipeline.geos_it_tasks", "DownloadNewGESDISCOrders", 
                     "--local-scheduler"
             ],
             "console": "integratedTerminal",

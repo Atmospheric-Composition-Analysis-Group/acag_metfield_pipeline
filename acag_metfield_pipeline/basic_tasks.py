@@ -3,6 +3,7 @@ import pathlib
 import luigi
 import acag_metfield_pipeline.static_utils
 from datetime import datetime, timedelta, time
+import shutil
 
 
 class DateMinuteTask(luigi.Task):
@@ -86,6 +87,7 @@ class DateMinuteRangeAggregator(luigi.WrapperTask):
 
 class BatchDownload(luigi.WrapperTask):
     root_dir = luigi.Parameter()
+    processed_lists_dir = luigi.OptionalParameter()
     url_list = luigi.Parameter()
 
     file_type = 'text file'
@@ -121,3 +123,8 @@ class BatchDownload(luigi.WrapperTask):
             file_paths.append(file_path)
         for url, file_path in zip(urls, file_paths):
             yield DownloadTask(url=url, file_path=file_path)
+    
+    def run(self):
+        super().run()
+        if self.processed_lists_dir:
+            shutil.move(self.url_list, self.processed_lists_dir)

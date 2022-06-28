@@ -1,6 +1,8 @@
 import re
+import luigi
 import xarray as xr
 import acag_metfield_pipeline.basic_tasks
+import glob
 
 
 class DownloadGESDISCOrder(acag_metfield_pipeline.basic_tasks.BatchDownload):
@@ -25,3 +27,12 @@ class DownloadGESDISCOrder(acag_metfield_pipeline.basic_tasks.BatchDownload):
         finally:
             pass
         return opened_successfully
+
+
+class DownloadNewGESDISCOrders(luigi.WrapperTask):
+    new_orders_dir = luigi.Parameter()
+    processed_orders_dir = luigi.Parameter()
+
+    def requires(self):
+        for order in glob.glob(f"{self.new_orders_dir}/*.eml"):
+            yield DownloadGESDISCOrder(url_list=order, processed_lists_dir=self.processed_orders_dir)
