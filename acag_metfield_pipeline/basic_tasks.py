@@ -34,6 +34,8 @@ class DateMinuteTask(luigi.Task):
 
 
 class DownloadBaseTask(luigi.Task):
+    retry_count = 3
+    
     def get_url(self) -> str:
         raise NotImplementedError()
 
