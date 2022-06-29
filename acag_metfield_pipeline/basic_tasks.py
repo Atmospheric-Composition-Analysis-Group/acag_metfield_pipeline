@@ -1,9 +1,9 @@
-from multiprocessing.sharedctypes import Value
 import pathlib
 import luigi
 import acag_metfield_pipeline.static_utils
 from datetime import datetime, timedelta, time
 import shutil
+import re
 
 
 class DateMinuteTask(luigi.Task):
@@ -34,7 +34,6 @@ class DateMinuteTask(luigi.Task):
 
 
 class DownloadBaseTask(luigi.Task):
-    retry_count = 3
     
     def get_url(self) -> str:
         raise NotImplementedError()
@@ -137,7 +136,33 @@ class BatchDownload(luigi.WrapperTask):
             shutil.move(self.url_list, self.processed_lists_dir)
 
 
+RECORD_FAILURES=True
+
+class RerunFailedTasks(luigi.WrapperTask):
+    def requires(self):
+        with open("failed_tasks.txt", "r") as file:
+            for line in file.readlines():
+                if len(line) == 0:
+                    continue
+                task, import_exec, _ = line.split(";")
+                exec(import_exec)
+                yield eval(task)
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        global RECORD_FAILURES
+        RECORD_FAILURES = False
+
+    def on_failure(self, exception):
+        return
+
 @luigi.Task.event_handler(luigi.Event.FAILURE)
-def on_failure_callback(task):
+def on_failure_callback(task, exception):
+    global RECORD_FAILURES
+    if not RECORD_FAILURES:
+        return
     with open("failed_tasks.txt", "a") as f:
-        f.write(task.__repr__())
+        re_to_wrap_args_in_quotes = re.compile(r'([\w]+)=([^"\',]+)([,\)])')
+        task_repr = re_to_wrap_args_in_quotes.sub('\\1="\\2"\\3', task.__repr__())
+        task_repr = task_repr.replace("\\", "\\\\")
+        f.write(f'{task_repr};from {task.__class__.__module__} import {task.__class__.__name__};{exception}\n')

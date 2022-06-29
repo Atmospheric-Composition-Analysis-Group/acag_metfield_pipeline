@@ -31,6 +31,19 @@
             "console": "integratedTerminal",
             "justMyCode": false,
             "cwd": "${workspaceRoot}"
+        },
+        {
+            "name": "Python: Test Rerun",
+            "type": "python",
+            "request": "launch",
+            "module": "luigi",
+            "args": [ 
+                    "--module", "acag_metfield_pipeline.basic_tasks", "RerunFailedTasks", 
+                    "--local-scheduler"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "cwd": "${workspaceRoot}"
         }
     ]
 }
