@@ -165,4 +165,5 @@ def on_failure_callback(task, exception):
         re_to_wrap_args_in_quotes = re.compile(r'([\w]+)=([^"\',]+)([,\)])')
         task_repr = re_to_wrap_args_in_quotes.sub('\\1="\\2"\\3', task.__repr__())
         task_repr = task_repr.replace("\\", "\\\\")
-        f.write(f'{task_repr};from {task.__class__.__module__} import {task.__class__.__name__};{exception}\n')
+        exception_str = str(exception).replace("\n", "\\n")
+        f.write(f'{task_repr};from {task.__class__.__module__} import {task.__class__.__name__};{exception_str}\n')
