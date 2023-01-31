@@ -3,6 +3,7 @@ import luigi
 import xarray as xr
 import acag_metfield_pipeline.basic_tasks
 import glob
+from datetime import datetime, timedelta, time
 
 
 class DownloadGESDISCOrder(acag_metfield_pipeline.basic_tasks.BatchDownload):
@@ -12,7 +13,8 @@ class DownloadGESDISCOrder(acag_metfield_pipeline.basic_tasks.BatchDownload):
         pattern = re.compile(r'https://goldsfs1\.gesdisc\.eosdis\.nasa\.gov/data/GEOSIT/(.*)\.hidden/(.*)')
         if not pattern.match(url):
             raise ValueError(f"Unexpected url: {url}")
-        return pattern.sub(r'\1\2', url)
+        return "{date:Y%Y/M%m/D%d}/" f"GEOS.it.asm.{self.collection_name}" ".{date:%Y%m%d_%H%M}.V01.nc4"
+        #return pattern.sub(r'\1\2', url)
 
     def skip_download(self, url: str):
         return not re.match(r'.*\.nc4$', url)
