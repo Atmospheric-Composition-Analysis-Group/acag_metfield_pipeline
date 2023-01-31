@@ -13,8 +13,7 @@ class DownloadGESDISCOrder(acag_metfield_pipeline.basic_tasks.BatchDownload):
         pattern = re.compile(r'https://goldsfs1\.gesdisc\.eosdis\.nasa\.gov/data/GEOSIT/(.*)\.hidden/(.*)')
         if not pattern.match(url):
             raise ValueError(f"Unexpected url: {url}")
-        date_regex = r"(\d{4}-\d{2}-\d{2})"
-        date = re.search (date_regex , url)
+        date = re.search ('(\d{4}-\d{2}-\d{2})' , url)
         print (date)
         year = date[0:3]
         month = date[5:6]
