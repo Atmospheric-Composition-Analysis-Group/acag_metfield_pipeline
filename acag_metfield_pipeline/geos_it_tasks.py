@@ -30,7 +30,49 @@ class DownloadGESDISCOrder(acag_metfield_pipeline.basic_tasks.BatchDownload):
             pass
         return opened_successfully
 
+class GEOSIT_ASM_I3_C_V72(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_ASM_I3_C_V72.5.29.4"
 
+class GEOSIT_ASM_T3_C_V72(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_ASM_T3_C_V72.5.29.4"
+
+class GEOSIT_CHM_T3_C_SLV(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_CHM_T3_C_SLV.5.29.4"
+    
+class GEOSIT_CLD_T3_C_V72(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_CLD_T3_C_V72.5.29.4"
+    
+class GEOSIT_CTM_I1_C_V72(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_CTM_I1_C_V72.5.29.4"
+
+class GEOSIT_CTM_T1_C_V72(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_CTM_T1_C_V72.5.29.4"
+
+class GEOSIT_FLX_T1_C_SLV(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_FLX_T1_C_SLV.5.29.4"
+    
+class GEOSIT_LFO_T1_C_SLV(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_LFO_T1_C_SLV.5.29.4"
+    
+class GEOSIT_LND_T1_C_SLV(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_LND_T1_C_SLV.5.29.4"
+    
+class GEOSIT_MST_T3_C_V72(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_MST_T3_C_V72.5.29.4"
+    
+class GEOSIT_MST_T3_C_V73(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_MST_T3_C_V73.5.29.4"
+    
+class GEOSIT_RAD_T1_C_SLV(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_RAD_T1_C_SLV.5.29.4"
+    
+class GEOSIT_RAD_T3_C_V72(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_RAD_T3_C_V72.5.29.4"
+    
+class GEOSIT_SLV_T1_C_SLV(DownloadGESDISCOrder):
+    collection_name = "GEOSIT_SLV_T1_C_SLV.5.29.4"
+    
+    
 class DownloadNewGESDISCOrders(luigi.WrapperTask):
     new_orders_dir = luigi.Parameter()
     processed_orders_dir = luigi.Parameter()
