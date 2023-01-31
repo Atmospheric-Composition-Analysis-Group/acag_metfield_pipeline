@@ -22,7 +22,7 @@ class DownloadGESDISCOrder(acag_metfield_pipeline.basic_tasks.BatchDownload):
         day = date[8:9]
         name = pattern.sub(r'\1\2', url)
         print (name)
-        return "{year}/{month}/{day}/{name}"
+        return f"{year}/{month}/{day}/{name}"
         #return pattern.sub(r'\1\2', url)
 
     def skip_download(self, url: str):
