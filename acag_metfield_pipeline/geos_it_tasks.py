@@ -39,10 +39,10 @@ class DownloadGESDISCOrder(acag_metfield_pipeline.basic_tasks.BatchDownload):
             pass
         return opened_successfully
     
-class DownloadNewGESDISCOrders(luigi.WrapperTask):
-    new_orders_dir = luigi.Parameter()
-    processed_orders_dir = luigi.Parameter()
+#class DownloadNewGESDISCOrders(luigi.WrapperTask):
+#    new_orders_dir = luigi.Parameter()
+#    processed_orders_dir = luigi.Parameter()
 
-    def requires(self):
-        for order in glob.glob(f"{self.new_orders_dir}/*.eml"):
-            yield DownloadGESDISCOrder(url_list=order, processed_lists_dir=self.processed_orders_dir)
+#    def requires(self):
+#        for order in glob.glob(f"{self.new_orders_dir}/*.eml"):
+#           yield DownloadGESDISCOrder(url_list=order, processed_lists_dir=self.processed_orders_dir)
