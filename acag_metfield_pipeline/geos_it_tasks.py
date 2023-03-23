@@ -13,16 +13,6 @@ class DownloadGESDISCOrder(acag_metfield_pipeline.basic_tasks.BatchDownload):
         pattern = re.compile(r'https://goldsfs1\.gesdisc\.eosdis\.nasa\.gov/data/GEOSIT/(.*)\.hidden/(.*)')
         if not pattern.match(url):
             raise ValueError(f"Unexpected url: {url}")
-        #date = re.search (r'(\d{4}-\d{2}-\d{2})' , url)
-        #if date:
-        #   return date.group(1)
-        #print (date)
-        #year = date[0:3]
-        #month = date[5:6]
-        #day = date[8:9]
-        #name = pattern.sub(r'\1\2', url)
-        #print (name)
-        #return f"{year}/{month}/{day}/{name}"
         return pattern.sub(r'\1\2', url)
 
     def skip_download(self, url: str):
